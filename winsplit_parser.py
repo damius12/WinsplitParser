@@ -199,7 +199,10 @@ def print_gaps(best_splits, splits):
             # Get gap in %
             actual_best_split = best_splits[i] - datetime(1900, 1, 1)
             actual_to_print = "(+"
-            actual_to_print += str(math.ceil((delta_time / actual_best_split) * 100))
+            try:
+                actual_to_print += str(math.ceil((delta_time / actual_best_split) * 100))
+            except:
+                actual_to_print += "-"
             actual_to_print += "%)"
             gap_percent.append(actual_to_print)
             
