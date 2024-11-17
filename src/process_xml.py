@@ -192,7 +192,7 @@ def process_xml(xml_content: str) -> dict:
 
 # Example usage
 if __name__ == "__main__":
-    with open("sample.xml", "r") as file:
+    with open("sample.xml", "r", encoding='utf-8') as file:
         xml_content = file.read()
     result = process_xml(xml_content)
     print(result)

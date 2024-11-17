@@ -13,7 +13,7 @@ from src.process_xml import (
 class TestProcessXML(unittest.TestCase):
 
     def setUp(self):
-        with open("sample.xml", "r") as file:
+        with open("sample.xml", "r", encoding='utf-8') as file:
             self.xml_content = file.read()
         self.root = ET.fromstring(self.xml_content)
         self.namespace = {"ns": "http://www.orienteering.org/datastandard/3.0"}

@@ -73,12 +73,13 @@ def _format_runner_splits(splits: list, nr_of_elements_per_row: int) -> str:
         lines.append(" ".join(split_times))
         lines.append(" ".join(split_gap_times))
         lines.append(" ".join(split_gap_percentages))
+        lines.append("")
 
     return "\n".join(lines)
 
 
 def format_results(
-    data: dict, analysis: list, detailed_analysis: list, splits_per_row: int
+    data: dict, basic_analysis: list, advanced_analysis: list, splits_per_row: int
 ) -> str:
     """
     Formats the results into a string with event data, runner titles, and optionally detailed splits.
@@ -86,8 +87,8 @@ def format_results(
 
     Args:
         data (dict): The result data from process_xml.
-        analysis (list): List of runner names for basic analysis.
-        detailed_analysis (list): List of runner names for detailed analysis.
+        basic_analysis (list): List of runner names for basic analysis.
+        advanced_analysis (list): List of runner names for advanced analysis.
         splits_per_row (int): Number of split times to display per row.
 
     Returns:
@@ -98,12 +99,10 @@ def format_results(
     lines.append(_format_event_data(data["event_data"]))
 
     for result in data["results"]:
-        if result["name"] in analysis + detailed_analysis:
+        if result["name"] in basic_analysis + advanced_analysis:
             lines.append(_format_runner_title(result, data["winning_time"]))
-        if result["name"] in detailed_analysis:
-            lines.append(
-                _format_runner_splits(result["splits"], splits_per_row)
-            )
+        if result["name"] in advanced_analysis:
+            lines.append(_format_runner_splits(result["splits"], splits_per_row))
 
     return "\n".join(lines)
 
@@ -112,12 +111,12 @@ def format_results(
 if __name__ == "__main__":
     from src.process_xml import process_xml
 
-    with open("sample.xml", "r") as file:
+    with open("sample.xml", "r", encoding='utf-8') as file:
         xml_content = file.read()
-    analysis = ["Ella Sandberg", "Tilde Jonsson", "Miranda Strand"]
-    detailed_analysis = ["Johanna Dahlin"]
+    basic_analysis = ["Ella Sandberg", "Tilde Jonsson", "Miranda Strand"]
+    advanced_analysis = ["Johanna Dahlin"]
     data = process_xml(xml_content)
     formatted_results = format_results(
-        data, analysis, detailed_analysis, splits_per_row=7
+        data, basic_analysis, advanced_analysis, splits_per_row=7
     )
     print(formatted_results)
