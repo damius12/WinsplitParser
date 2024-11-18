@@ -86,7 +86,7 @@ def format_results(
     Each runner's result includes position, name, club, total time, and time behind the winner if applicable.
 
     Args:
-        data (dict): The result data from process_xml.
+        data (dict): The result data from parse_xml.
         basic_analysis (list): List of runner names for basic analysis.
         advanced_analysis (list): List of runner names for advanced analysis.
         splits_per_row (int): Number of split times to display per row.
@@ -109,13 +109,13 @@ def format_results(
 
 # Example usage
 if __name__ == "__main__":
-    from src.process_xml import process_xml
+    from src.parse_xml import parse_xml
 
-    with open("sample.xml", "r", encoding='utf-8') as file:
+    with open("sample.xml", "r", encoding="utf-8") as file:
         xml_content = file.read()
     basic_analysis = ["Ella Sandberg", "Tilde Jonsson", "Miranda Strand"]
     advanced_analysis = ["Johanna Dahlin"]
-    data = process_xml(xml_content)
+    data = parse_xml(xml_content)
     formatted_results = format_results(
         data, basic_analysis, advanced_analysis, splits_per_row=7
     )

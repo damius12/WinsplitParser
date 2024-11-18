@@ -128,71 +128,31 @@ def _extract_result_list(root: ET.Element, namespace: dict) -> list:
     return result_list
 
 
-def _compute_best_split_times(result_list: list) -> dict:
+def parse_xml(xml_content: str) -> dict:
     """
-    Finds the best split time for each control from the parsed results.
-    """
-    best_split_times = {}
+    Parses the provided XML content and extracts event data and results.
 
-    for person in result_list:
-        for split in person["splits"]:
-            control_code = split["control_code"]
-            split_time = split["split_time"]
+    Args:
+        xml_content (str): A string containing the XML data to be parsed.
 
-            if split_time is None:
-                continue
-            elif control_code not in best_split_times:
-                best_split_times[control_code] = split_time
-            elif split_time < best_split_times[control_code]:
-                best_split_times[control_code] = split_time
-
-    return best_split_times
-
-
-def _add_split_analysis(result_list: list, best_split_times: dict) -> None:
-    """
-    Adds split analysis information to each runner's splits.
-    """
-    for person in result_list:
-        for split in person["splits"]:
-            control_code = split["control_code"]
-            split_time = split["split_time"]
-            best_split_time = best_split_times[control_code]
-
-            if split_time is None:
-                split_gap = None
-                percentage_gap = None
-            else:
-                split_gap = split_time - best_split_time
-                percentage_gap = (split_gap / best_split_time) * 100
-
-            split["split_gap"] = split_gap
-            split["percentage_gap"] = percentage_gap
-
-
-def process_xml(xml_content: str) -> dict:
-    """
-    Processes the XML content to extract split information and compute the best split times
-    for each control.
+    Returns:
+        dict: A dictionary containing the extracted event data and results.
     """
     root = ET.fromstring(xml_content)
     namespace = {"ns": "http://www.orienteering.org/datastandard/3.0"}
 
     event_data = _extract_event_data(root, namespace)
     result_list = _extract_result_list(root, namespace)
-    best_split_times = _compute_best_split_times(result_list)
-    _add_split_analysis(result_list, best_split_times)
 
     return {
         "event_data": event_data,
         "results": result_list,
-        "winning_time": result_list[0]["total_time"],
     }
 
 
 # Example usage
 if __name__ == "__main__":
-    with open("sample.xml", "r", encoding='utf-8') as file:
+    with open("sample.xml", "r", encoding="utf-8") as file:
         xml_content = file.read()
-    result = process_xml(xml_content)
+    result = parse_xml(xml_content)
     print(result)
