@@ -1,10 +1,8 @@
 from src.format_results import format_results
 from src.get_result import get_result
 from src.parse_xml import parse_xml
+from src.plot_results import plot_results
 from src.process_data import process_data
-
-BASIC_ANALYSIS_POSITIONS = [1, 2, 3] + list(range(10, 100, 10))
-# BASIC_ANALYSIS_POSITIONS = list(range(1, 11))
 
 
 def _get_names_by_position(positions: list, data: dict) -> list:
@@ -44,6 +42,9 @@ def main(
         xml_content = get_result(url)
         data = parse_xml(xml_content)
         process_data(data)
+
+        # TODO Save the plot to file instead of using matplotlib
+        # plot_results(data, advanced_analysis)
 
         basic_analysis = _get_names_by_position(basic_analysis_positions, data)
         if basic_analysis_include_same_club:

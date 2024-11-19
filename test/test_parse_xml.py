@@ -25,7 +25,7 @@ class TestParseXML(unittest.TestCase):
     def test_compute_split_information(self):
         person_result = self.root.findall(".//ns:PersonResult", self.namespace)[11]
         splits = _compute_split_information(person_result, self.namespace)
-        self.assertEqual(len(splits), 17)
+        self.assertEqual(len(splits), 18)
         self.assertEqual(splits[0]["control_code"], "118")
         self.assertEqual(splits[0]["time"], 78)
         self.assertEqual(splits[0]["split_time"], 78)
@@ -36,7 +36,7 @@ class TestParseXML(unittest.TestCase):
     def test_compute_split_information_misspunched(self):
         person_result = self.root.findall(".//ns:PersonResult", self.namespace)[-5]
         splits = _compute_split_information(person_result, self.namespace)
-        self.assertEqual(len(splits), 17)
+        self.assertEqual(len(splits), 18)
         self.assertEqual(splits[1]["control_code"], "40")
         self.assertEqual(splits[1]["time"], None)
         self.assertEqual(splits[1]["split_time"], None)
@@ -55,7 +55,7 @@ class TestParseXML(unittest.TestCase):
         self.assertEqual(person_dict["status"], "OK")
         self.assertEqual(person_dict["position"], 12)
         self.assertEqual(person_dict["total_time"], 2218)
-        self.assertEqual(len(person_dict["splits"]), 17)
+        self.assertEqual(len(person_dict["splits"]), 18)
 
     def test_extract_person_result_misspunched(self):
         person_result = self.root.findall(".//ns:PersonResult", self.namespace)[-5]
@@ -63,7 +63,7 @@ class TestParseXML(unittest.TestCase):
         self.assertEqual(person_dict["status"], "MissingPunch")
         self.assertEqual(person_dict["position"], None)
         self.assertEqual(person_dict["total_time"], 5686)
-        self.assertEqual(len(person_dict["splits"]), 17)
+        self.assertEqual(len(person_dict["splits"]), 18)
 
     def test_extract_result_list(self):
         result_list = _extract_result_list(self.root, self.namespace)

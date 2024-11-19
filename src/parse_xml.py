@@ -61,6 +61,17 @@ def _compute_split_information(person_result: ET.Element, namespace: dict) -> li
         )
         previous_time = time
 
+    # TODO handle missing finish time
+    final_time = int(person_result.find(".//ns:Time", namespace).text)
+    split_time = final_time - previous_time if previous_time is not None else None
+    splits.append(
+        {
+            "control_code": "F",
+            "time": final_time,
+            "split_time": split_time,
+        }
+    )
+
     return splits
 
 

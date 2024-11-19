@@ -1,10 +1,6 @@
 import unittest
 
-from src.process_data import (
-    _add_split_analysis,
-    _compute_best_split_times,
-    process_data,
-)
+from src.process_data import process_data
 
 
 class TestProcessData(unittest.TestCase):
@@ -41,30 +37,22 @@ class TestProcessData(unittest.TestCase):
             ]
         }
 
-    def test_compute_best_split_times(self):
-        best_split_times = _compute_best_split_times(self.data["results"])
-        self.assertEqual(best_split_times["118"], 72)
-        self.assertEqual(best_split_times["40"], 130)
-        self.assertEqual(best_split_times["36"], 57)
-        self.assertEqual(best_split_times["58"], 100)
-
-    def test_add_split_analysis(self):
-        best_split_times = _compute_best_split_times(self.data["results"])
-        _add_split_analysis(self.data["results"], best_split_times)
-        self.assertEqual(self.data["results"][0]["splits"][0]["split_gap"], 0)
-        self.assertEqual(self.data["results"][0]["splits"][0]["percentage_gap"], 0.0)
-        self.assertEqual(self.data["results"][1]["splits"][0]["split_gap"], 8)
-        self.assertAlmostEqual(
-            self.data["results"][1]["splits"][0]["percentage_gap"], 11.11, 2
-        )
-        self.assertEqual(self.data["results"][1]["splits"][1]["split_gap"], None)
-        self.assertEqual(self.data["results"][1]["splits"][1]["percentage_gap"], None)
-
     def test_process_data(self):
         process_data(self.data)
+
         self.assertEqual(self.data["winning_time"], 379)
-        self.assertIn("split_gap", self.data["results"][0]["splits"][0])
-        self.assertIn("percentage_gap", self.data["results"][0]["splits"][0])
+
+        splits_runner_0 = self.data["results"][0]["splits"]
+        splits_runner_1 = self.data["results"][1]["splits"]
+
+        self.assertEqual(splits_runner_0[0]["split_gap"], 0)
+        self.assertEqual(splits_runner_0[0]["percentage_gap"], 0.0)
+
+        self.assertEqual(splits_runner_1[0]["split_gap"], 8)
+        self.assertAlmostEqual(splits_runner_1[0]["percentage_gap"], 11.11, 2)
+
+        self.assertEqual(splits_runner_1[1]["split_gap"], None)
+        self.assertEqual(splits_runner_1[1]["percentage_gap"], None)
 
 
 if __name__ == "__main__":

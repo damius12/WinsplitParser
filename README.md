@@ -31,12 +31,19 @@ http://obasen.orientering.se/winsplits/online/sv/default.asp?page=table&database
 
 ## Parameters
 
-You can customize the analysis by setting parameters in the `main` function in `src/main.py`:
+You can customize the analysis by passing arguments to the `main` script:
 
-- `ADVANCED_ANALYSIS`: List of runner names for advanced analysis.
-- `BASIC_ANALYSIS_INCLUDE_SAME_CLUB`: Whether to include the clubs of the advanced analysis runners in the basic analysis.
-- `BASIC_ANALYSIS_POSITIONS`: List of positions to include in the basic analysis.
-- `SPLITS_PER_ROW`: Number of splits to display per row in the output.
+- `--advanced-analysis`: List of runner names for advanced analysis.
+- `--basic-analysis-include-same-club`: Whether to include the clubs of the advanced analysis runners in the basic analysis.
+- `--basic-analysis-positions`: List of positions to include in the basic analysis.
+- `--splits-per-row`: Number of splits to display per row in the output.
+
+### Example
+
+Run the program with custom parameters:
+```sh
+python -m src.main --advanced-analysis "Runner1,Runner2" --basic-analysis-include-same-club True --basic-analysis-positions "1,2,3" --splits-per-row 5
+```
 
 ## Development
 
@@ -47,6 +54,5 @@ python -m unittest discover
 
 ## Future ideas
 
-- Add a graph for visually analysing the performance, based on the gap to the mean of the top 3 splits on each leg (similar to the feature present on [swiss orienteering](https://www.o-l.ch/cgi-bin/results?type=rang&year=2024&rl_id=7592&kat=HAL&zwizt=1&graph=1)).
 - Add a GUI where the event list is shown as a dropdown menu, and then a class can be chosen in a dropdown menu, as well as the possibility to change the default parameters.
 - Make it a proper python package and distribute it.

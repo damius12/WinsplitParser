@@ -1,15 +1,18 @@
-def _compute_best_split_times(results: list) -> dict:
+import statistics
+
+
+def _compute_aggregated_split_times(results: list) -> dict:
     """
-    Computes the best split times for each control from the parsed results.
+    Computes aggregated and sorted split times from a list of results.
 
     Args:
         results (list): A list of dictionaries, each containing information about a person's result.
 
     Returns:
-        dict: A dictionary where the keys are control codes (str) and the values are the best split times (float).
-              The best split time is the minimum split time recorded for each control code.
+        dict: A dictionary where the keys are control codes and the values are lists of split times sorted in ascending order.
     """
-    best_split_times = {}
+
+    aggregated_split_times = {}
 
     for person in results:
         for split in person["splits"]:
@@ -18,31 +21,51 @@ def _compute_best_split_times(results: list) -> dict:
 
             if split_time is None:
                 continue
-            elif control_code not in best_split_times:
-                best_split_times[control_code] = split_time
-            elif split_time < best_split_times[control_code]:
-                best_split_times[control_code] = split_time
+            aggregated_split_times.setdefault(control_code, []).append(split_time)
 
-    return best_split_times
+    for key in aggregated_split_times:
+        aggregated_split_times[key].sort()
+
+    return aggregated_split_times
 
 
-def _add_split_analysis(results: list, best_split_times: dict) -> None:
+def _add_reference_splits(data: dict) -> None:
+    """
+    Adds the best split times and reference split times to the data dictionary.
+
+    Args:
+        data (dict): A dictionary containing race results and other related information.
+
+    Modifies:
+        data (dict): Adds the 'best_split_times' and 'reference_split_times' keys to the dictionary.
+    """
+    aggregated_split_times = _compute_aggregated_split_times(data["results"])
+    best_split_times = {}
+    reference_split_times = {}
+
+    for control_code, splits in aggregated_split_times.items():
+        best_split_times[control_code] = splits[0]
+        reference_split_times[control_code] = statistics.mean(splits[:5])
+
+    data["best_split_times"] = best_split_times
+    data["reference_split_times"] = reference_split_times
+
+
+def _add_split_analysis(data: dict) -> None:
     """
     Adds split analysis information to each runner's splits.
 
     Args:
-        results (list): A list of dictionaries, each containing information about a person's result.
-        best_split_times (dict): A dictionary mapping control codes to the best split times
-                                    recorded for those control points.
+        data (dict): A dictionary containing race results and other related information.
 
     Modifies:
-        results (list): Updates the split information for each runner with split gaps and percentage gaps.
+        data (dict): Updates the 'results' key with split analysis
     """
-    for person in results:
+    for person in data["results"]:
         for split in person["splits"]:
             control_code = split["control_code"]
             split_time = split["split_time"]
-            best_split_time = best_split_times[control_code]
+            best_split_time = data["best_split_times"][control_code]
 
             if split_time is None:
                 split_gap = None
@@ -66,9 +89,7 @@ def process_data(data: dict):
     Modifies:
         data (dict): Updates the 'results' key with split analysis and adds the 'winning_time' key.
     """
-    results = data["results"]
-    best_split_times = _compute_best_split_times(results)
-    _add_split_analysis(results, best_split_times)
+    _add_reference_splits(data)
+    _add_split_analysis(data)
 
-    data["results"] = results
-    data["winning_time"] = results[0]["total_time"]
+    data["winning_time"] = data["results"][0]["total_time"]
