@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- Taken from http://obasen.orientering.se/winsplits/online/sv/default.asp?page=table&databaseId=100310&categoryId=1-->
+<!-- Taken from http://obasen.orientering.se/winsplits/online/sv/default.asp?page=table&databaseId=100310&categoryId=1 -->
 <ResultList xmlns:ws="http://www.winsplits.se/IofXmlExtensions" xmlns:eventor="http://eventor.orientering.se/iofxmlextensions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" iofVersion="3.0" createTime="2024-09-22T12:38:24Z" creator="WinSplits.Api" xmlns="http://www.orienteering.org/datastandard/3.0">
   <Event>
     <Id>100310</Id>

@@ -3,11 +3,8 @@ from src.get_result import get_result
 from src.parse_xml import parse_xml
 from src.process_data import process_data
 
-ADVANCED_ANALYSIS = ["Sebastian Inderst"]
-BASIC_ANALYSIS_INCLUDE_SAME_CLUB = True
 BASIC_ANALYSIS_POSITIONS = [1, 2, 3] + list(range(10, 100, 10))
 # BASIC_ANALYSIS_POSITIONS = list(range(1, 11))
-SPLITS_PER_ROW = 7
 
 
 def _get_names_by_position(positions: list, data: dict) -> list:
@@ -24,27 +21,58 @@ def _get_clubs_by_name(names: list, data: dict) -> list:
     return [runner["club"] for runner in data["results"] if runner["name"] in names]
 
 
-def main():
+def main(
+    url: str,
+    advanced_analysis: list,
+    basic_analysis_include_same_club: bool,
+    basic_analysis_positions: list,
+    splits_per_row: int,
+) -> str:
+    """
+    Main function to process Winsplits data.
+
+    Args:
+        url (str): The URL to fetch the Winsplits data from.
+        advanced_analysis (list): List of runners for advanced analysis.
+        basic_analysis_include_same_club (bool): Flag to include same club in basic analysis.
+        basic_analysis_positions (list): List of positions for basic analysis.
+        splits_per_row (int): Number of splits per row for formatting results.
+    Returns:
+        str: The formatted results text.
+    """
     try:
-        url = input("Please enter the Winsplits URL: ")
         xml_content = get_result(url)
         data = parse_xml(xml_content)
         process_data(data)
 
-        basic_analysis = _get_names_by_position(BASIC_ANALYSIS_POSITIONS, data)
-        if BASIC_ANALYSIS_INCLUDE_SAME_CLUB:
-            clubs = _get_clubs_by_name(ADVANCED_ANALYSIS, data)
+        basic_analysis = _get_names_by_position(basic_analysis_positions, data)
+        if basic_analysis_include_same_club:
+            clubs = _get_clubs_by_name(advanced_analysis, data)
             basic_analysis += _get_names_by_club(clubs, data)
         results_text = format_results(
-            data, basic_analysis, ADVANCED_ANALYSIS, SPLITS_PER_ROW
+            data, basic_analysis, advanced_analysis, splits_per_row
         )
 
-        print(results_text)
-        input("Press any key to exit...")
+        return results_text
 
     except Exception as e:
         print(f"An error occurred: {e}")
 
 
 if __name__ == "__main__":
-    main()
+    from src.argument_parser import parse_args
+
+    args = parse_args()
+
+    if args.url is None:
+        args.url = input("Please enter the Winsplits URL: ")
+
+    results_text = main(
+        args.url,
+        args.advanced_analysis,
+        args.basic_analysis_include_same_club,
+        args.basic_analysis_positions,
+        args.splits_per_row,
+    )
+
+    print(results_text)
