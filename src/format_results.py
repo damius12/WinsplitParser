@@ -1,13 +1,3 @@
-def _format_event_data(event_data: dict) -> str:
-    """
-    Formats the event data into a string with the event name and date.
-    """
-    name = event_data["name"]
-    class_name = event_data["class"]
-    date = event_data["date"]
-    return f"{name} - {class_name} ({date})"
-
-
 def _format_time(total_time_seconds: int) -> str:
     """
     Converts total time from seconds to mm:ss format.
@@ -96,8 +86,6 @@ def format_results(
     """
     lines = []
 
-    lines.append(_format_event_data(data["event_data"]))
-
     for result in data["results"]:
         if result["name"] in basic_analysis + advanced_analysis:
             lines.append(_format_runner_title(result, data["winning_time"]))
@@ -107,16 +95,38 @@ def format_results(
     return "\n".join(lines)
 
 
+def get_file_title(event_data: dict) -> str:
+    """
+    Formats the event data into a string with the event name and date.
+    """
+    name = event_data["name"]
+    date = event_data["date"].replace("-", "")[2:]
+    return f"{date} {name}.docx"
+
+
+def format_event_data(event_data: dict) -> str:
+    """
+    Formats the event data into a string with the event name and date.
+    """
+    name = event_data["name"]
+    class_name = event_data["class"]
+    date = event_data["date"]
+    return f"{name} - {class_name} ({date})"
+
+
 # Example usage
 if __name__ == "__main__":
     from src.parse_xml import parse_xml
+    from src.process_data import process_data
 
     with open("sample.xml", "r", encoding="utf-8") as file:
         xml_content = file.read()
-    basic_analysis = ["Ella Sandberg", "Tilde Jonsson", "Miranda Strand"]
-    advanced_analysis = ["Johanna Dahlin"]
+    basic_analysis = ["Vegard Kittilsen", "Filip Ossianson"]
+    advanced_analysis = ["Sebastian Inderst"]
     data = parse_xml(xml_content)
+    process_data(data)
+    formatted_event = format_event_data(data["event_data"])
     formatted_results = format_results(
         data, basic_analysis, advanced_analysis, splits_per_row=7
     )
-    print(formatted_results)
+    print(formatted_event + "\n####################\n" + formatted_results)

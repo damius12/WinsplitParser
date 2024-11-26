@@ -1,6 +1,6 @@
 # WinsplitParser
 
-WinsplitParser is a tool for parsing Winsplits results. It processes the results from a given Winsplits URL and provides advanced analysis, including splits, time, and percentage lost on each split.
+WinsplitParser is a tool for parsing Winsplits results. It processes the results from a given Winsplits URL and provides advanced analysis, including splits, time, and percentage lost on each split, and stores it in a Word file.
 
 ## Features
 

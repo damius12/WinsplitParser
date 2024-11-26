@@ -3,7 +3,7 @@ from itertools import accumulate
 import matplotlib.pyplot as plt
 
 
-def plot_results(data: dict, advanced_analysis: list) -> None:
+def plot_results(data: dict, advanced_analysis: list, output_file: str) -> None:
     """
     Plots the comparison to the reference splits.
 
@@ -32,4 +32,6 @@ def plot_results(data: dict, advanced_analysis: list) -> None:
     plt.ylabel("Time (s)")
     plt.grid()
     plt.legend()
-    plt.show()
+
+    plt.savefig(output_file)
+    plt.close()
