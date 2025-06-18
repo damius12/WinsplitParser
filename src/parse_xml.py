@@ -110,8 +110,9 @@ def _extract_person_result(person_result: ET.Element, namespace: dict) -> dict:
         person_dict["position"] = int(result.find("ns:Position", namespace).text)
     else:
         person_dict["position"] = None
+    if result.find(".//ns:Time", namespace) is None:
+        return None
     person_dict["total_time"] = int(result.find(".//ns:Time", namespace).text)
-
     person_dict["splits"] = _compute_split_information(person_result, namespace)
 
     return person_dict
@@ -134,7 +135,8 @@ def _extract_result_list(root: ET.Element, namespace: dict) -> list:
     # Find all PersonResult entries
     for person_result in root.findall(".//ns:PersonResult", namespace):
         person_dict = _extract_person_result(person_result, namespace)
-        result_list.append(person_dict)
+        if person_dict is not None:
+            result_list.append(person_dict)
 
     return result_list
 
