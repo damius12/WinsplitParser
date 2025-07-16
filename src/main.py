@@ -1,11 +1,11 @@
 import os
 
-from src.create_word import create_word
-from src.format_results import format_event_data, format_results, get_file_title
-from src.get_result import get_result
-from src.parse_xml import parse_xml
-from src.plot_results import plot_results
-from src.process_data import process_data
+# from create_word import create_word
+from format_results import format_event_data, format_results, get_file_title
+from get_result import get_result
+from parse_xml import parse_xml
+from plot_results import plot_results
+from process_data import process_data
 
 
 def _get_names_by_position(positions: list, data: dict) -> list:
@@ -62,7 +62,7 @@ def main(
         if advanced_analysis:
             plot_results(data, advanced_analysis, temporary_image)
 
-        create_word(event_title, results_text, temporary_image, file_title)
+        # create_word(event_title, results_text, temporary_image, file_title)
 
         if os.path.exists(temporary_image):
             os.remove(temporary_image)
@@ -74,7 +74,7 @@ def main(
 
 
 if __name__ == "__main__":
-    from src.argument_parser import parse_args
+    from argument_parser import parse_args
 
     args = parse_args()
 
