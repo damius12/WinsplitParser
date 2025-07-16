@@ -8,6 +8,7 @@ python-docx = "*"
 matplotlib = "*"
 docx = "*"
 requests = "*"
+streamlit = "*"
 
 [dev-packages]
 

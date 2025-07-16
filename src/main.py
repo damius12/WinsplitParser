@@ -28,6 +28,7 @@ def main(
     basic_analysis_include_same_club: bool,
     basic_analysis_positions: list,
     splits_per_row: int,
+    output: str = 'word'
 ) -> str:
     """
     Main function to process Winsplits results and save to a Word document.
@@ -66,8 +67,8 @@ def main(
 
         if os.path.exists(temporary_image):
             os.remove(temporary_image)
-
-        return event_title + "\n" + results_text
+        
+        return event_title + "\n" + results_text if output == 'word' else data
 
     except Exception as e:
         print(f"An error occurred: {e}")
