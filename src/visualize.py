@@ -43,7 +43,8 @@ else:
         st.markdown(event_data["class"])
         "---"
         "Would you like to add the techical and/or physical features of this race's controls?"
-        "You can characterize each control with a custom set of criteria in order to gain a more tailored analysis!"
+        "You can characterize each control through a custom set of criteria in order to gain a more tailored analysis!"
+        "Don't worry, you can skip this part by clicking the button below."
 
         half, other = st.columns(2)
         with half:
@@ -66,14 +67,7 @@ else:
             ):
                 st.session_state.features_number -= 1
                 st.rerun()
-            "you can assign values within a customized range:"
-            feature_range = st.slider(
-                "range",
-                min_value=-10,
-                max_value=10,
-                value=(0, 5),
-                label_visibility="collapsed",
-            )
+
             "---"
             if "" in features_names:
                 st.warning("to proceed all fields must be filled")
