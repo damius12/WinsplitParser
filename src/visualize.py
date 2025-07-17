@@ -20,7 +20,7 @@ if "skip" not in st.session_state:
 
 if not st.session_state.data_fetched:
     url = st.text_input("insert winsplit url")
-    if st.button("fetch split times"):
+    if st.button("fetch split times", disabled=url == ""):
         st.session_state.raw = main(
             url,
             [],
@@ -90,7 +90,9 @@ else:
             if no.button("skip", use_container_width=True):
                 st.session_state.control_survey_spec = True
                 st.session_state.skip = True
-    if st.session_state.control_survey_spec and not st.session_state.assign_features:
+    if st.session_state.control_survey_spec and not (
+        st.session_state.assign_features or st.session_state.skip
+    ):
         st.write(st.session_state.features)
 
 if (
