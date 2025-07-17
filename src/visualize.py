@@ -9,7 +9,12 @@ from AltairCharts import AltairCharts
 
 st.set_page_config(layout="wide")
 
-if "raw" not in st.session_state:
+if "data_fetched" not in st.session_state:
+    st.session_state.data_fetched = False
+if "control_survey_spec" not in st.session_state:
+    st.session_state.control_survey_spec = False
+
+if not st.session_state.data_fetched:
     url = st.text_input("insert winsplit url")
     if st.button("fetch split times"):
         st.session_state.raw = main(
@@ -20,47 +25,64 @@ if "raw" not in st.session_state:
             5,
             "else",
         )
-event_data = st.session_state.raw["event_data"]
-raw = st.session_state.raw["results"]
-
-with st.sidebar:
-    st.subheader(event_data["name"])
-    event_data["class"]
-    "---"
-    personal_position = st.number_input("rank position", 1, len(raw))
-    personal_name = raw[personal_position - 1]["name"]
-    st.markdown(f"**{personal_name}**")
-    "---"
-    show_gap = st.radio("show gap", ["absolute", "relative"])
-
-df = pd.DataFrame()
-
-results = pd.DataFrame(raw[personal_position - 1]["splits"])
-df["gap"] = results["split_gap"]
-df["perc"] = results["percentage_gap"]
-df = df.drop(index=len(df) - 1)
-for i in df.index:
-    df.at[i, "control"] = i + 1
-
-y = "gap" if show_gap == "absolute" else "perc"
-y_label = "s" if show_gap == "absolute" else "%"
-color_scale = alt.Scale(
-    domain=[0, 50, 100, 300], range=["green", "yellow", "red", "darkred"]
-)
-altair = AltairCharts()
-bars = altair.data_chart("bar", df, "control:O", y, "perc:Q").encode(
-    y=(
-        alt.Y(
-            y,
-            title=y_label,
-            scale=(
-                alt.Scale(domain=[0, np.ceil(max(df["perc"]) / 100) * 100])
-                if show_gap == "relative"
-                else alt.Undefined
-            ),
+        st.session_state.data_fetched = True
+        st.rerun()
+else:
+    event_data = st.session_state.raw["event_data"]
+    raw = st.session_state.raw["results"]
+    if not st.session_state.control_survey_spec:
+        st.markdown(event_data["date"])
+        st.subheader(event_data["name"])
+        st.markdown(event_data["class"])
+        "---"
+        "Would you like to add the techical and/or physical features of this race's controls?"
+        "You can characterize each control with a custom set of criteria in order to gain a more tailored analysis!"
+        st.text_input(
+            "insert a feature",
+            placeholder="e. g.: climb, vegetation, runnability, tiredness, etc.",
         )
-    ),
-    color=alt.Color("perc:Q", scale=color_scale, title="percentage gap"),
-)
 
-st.altair_chart(bars)
+
+if st.session_state.data_fetched and st.session_state.control_survey_spec:
+
+    with st.sidebar:
+        st.subheader(event_data["name"])
+        event_data["class"]
+        "---"
+        personal_position = st.number_input("rank position", 1, len(raw))
+        personal_name = raw[personal_position - 1]["name"]
+        st.markdown(f"**{personal_name}**")
+        "---"
+        show_gap = st.radio("show gap", ["absolute", "relative"])
+
+    df = pd.DataFrame()
+
+    results = pd.DataFrame(raw[personal_position - 1]["splits"])
+    df["gap"] = results["split_gap"]
+    df["perc"] = results["percentage_gap"]
+    df = df.drop(index=len(df) - 1)
+    for i in df.index:
+        df.at[i, "control"] = i + 1
+
+    y = "gap" if show_gap == "absolute" else "perc"
+    y_label = "s" if show_gap == "absolute" else "%"
+    color_scale = alt.Scale(
+        domain=[0, 50, 100, 300], range=["green", "yellow", "red", "darkred"]
+    )
+    altair = AltairCharts()
+    bars = altair.data_chart("bar", df, "control:O", y, "perc:Q").encode(
+        y=(
+            alt.Y(
+                y,
+                title=y_label,
+                scale=(
+                    alt.Scale(domain=[0, np.ceil(max(df["perc"]) / 100) * 100])
+                    if show_gap == "relative"
+                    else alt.Undefined
+                ),
+            )
+        ),
+        color=alt.Color("perc:Q", scale=color_scale, title="percentage gap"),
+    )
+
+    st.altair_chart(bars)
