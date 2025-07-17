@@ -30,6 +30,8 @@ if not st.session_state.data_fetched:
 else:
     event_data = st.session_state.raw["event_data"]
     raw = st.session_state.raw["results"]
+    if "features_number" not in st.session_state:
+        st.session_state.features_number = 1
     if not st.session_state.control_survey_spec:
         st.markdown(event_data["date"])
         st.subheader(event_data["name"])
@@ -37,10 +39,23 @@ else:
         "---"
         "Would you like to add the techical and/or physical features of this race's controls?"
         "You can characterize each control with a custom set of criteria in order to gain a more tailored analysis!"
-        st.text_input(
-            "insert a feature",
-            placeholder="e. g.: climb, vegetation, runnability, tiredness, etc.",
-        )
+        st.subheader("Custom features:")
+        features_names = [1] * st.session_state.features_number
+        for i in range(0, st.session_state.features_number):
+            features_names[i] = st.text_input(
+                f"insert a feature {i}",
+                placeholder="e. g.: climb, vegetation, runnability, tiredness, etc.",
+                label_visibility="collapsed",
+            )
+        left, right = st.columns(2)
+        if left.button("add feature", type="primary", use_container_width=True):
+            st.session_state.features_number += 1
+            st.rerun()
+        if st.session_state.features_number > 0 and right.button(
+            "remove feature", use_container_width=True
+        ):
+            st.session_state.features_number -= 1
+            st.rerun()
 
 
 if st.session_state.data_fetched and st.session_state.control_survey_spec:
