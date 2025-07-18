@@ -111,6 +111,7 @@ else:
                         for i, name in enumerate(features_names)
                     }
                 )
+                features["controls"] = range(1, number_controls + 1)
                 st.session_state.features = features
                 st.session_state.control_survey_spec = True
                 st.rerun()
@@ -130,7 +131,6 @@ if st.session_state.data_fetched and (
         show_gap = st.radio("show gap", ["absolute", "relative"])
 
     df = pd.DataFrame()
-
     results = pd.DataFrame(raw[personal_position - 1]["splits"])
     df["gap"] = results["split_gap"]
     df["perc"] = results["percentage_gap"]
@@ -158,5 +158,4 @@ if st.session_state.data_fetched and (
         ),
         color=alt.Color("perc:Q", scale=color_scale, title="percentage gap"),
     )
-
     st.altair_chart(bars)
