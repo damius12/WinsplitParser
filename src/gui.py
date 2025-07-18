@@ -111,7 +111,6 @@ else:
                         for i, name in enumerate(features_names)
                     }
                 )
-                features["controls"] = range(1, number_controls + 1)
                 st.session_state.features = features
                 st.session_state.control_survey_spec = True
                 st.rerun()
@@ -122,7 +121,6 @@ if st.session_state.data_fetched and (
 
     features = st.session_state.features
     features_names = list(features.columns)
-    features_names.remove("controls")
     display_features = []
 
     with st.sidebar:
@@ -143,6 +141,7 @@ if st.session_state.data_fetched and (
                 display_features.append(name)
 
     df = pd.DataFrame()
+    df[display_features] = features[display_features]
     results = pd.DataFrame(raw[personal_position - 1]["splits"])
     df["gap"] = results["split_gap"]
     df["perc"] = results["percentage_gap"]
@@ -171,7 +170,3 @@ if st.session_state.data_fetched and (
         color=alt.Color("perc:Q", scale=color_scale, title="percentage gap"),
     )
     st.altair_chart(bars)
-
-    features = features[["controls"] + display_features]
-    if display_features != []:
-        st.bar_chart(features, x="controls")
