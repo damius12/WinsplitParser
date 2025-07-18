@@ -121,7 +121,8 @@ if st.session_state.data_fetched and (
 ):
 
     features = st.session_state.features
-    features_names = features.columns
+    features_names = list(features.columns)
+    features_names.remove("controls")
     display_features = []
 
     with st.sidebar:
@@ -170,3 +171,7 @@ if st.session_state.data_fetched and (
         color=alt.Color("perc:Q", scale=color_scale, title="percentage gap"),
     )
     st.altair_chart(bars)
+
+    features = features[["controls"] + display_features]
+    if display_features != []:
+        st.bar_chart(features, x="controls")
