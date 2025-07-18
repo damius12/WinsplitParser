@@ -35,7 +35,7 @@ else:
     raw = st.session_state.raw["results"]
     if "number_features" not in st.session_state:
         st.session_state.number_features = 2
-    if not st.session_state.control_survey_spec:
+    if not st.session_state.control_survey_spec and not st.session_state.skip:
         st.markdown(event_data["date"])
         st.subheader(event_data["name"])
         st.markdown(event_data["class"])
@@ -61,6 +61,7 @@ else:
 
             if st.button("skip", use_container_width=True):
                 st.session_state.skip = True
+                st.rerun()
 
         with other:
             st.subheader("Custom features")
@@ -120,10 +121,11 @@ else:
 if st.session_state.data_fetched and (
     st.session_state.control_survey_spec or st.session_state.skip
 ):
-
-    features = st.session_state.features
-    features_names = list(features.columns)
-    display_features = []
+    features_present = st.session_state.control_survey_spec
+    if features_present:
+        features = st.session_state.features
+        features_names = list(features.columns)
+        display_features = []
 
     with st.sidebar:
         st.subheader(event_data["name"])
@@ -137,13 +139,15 @@ if st.session_state.data_fetched and (
         show_gap = st.radio(
             "show gap", ["absolute", "relative"], label_visibility="collapsed"
         )
-        st.subheader("display features")
-        for name in features_names:
-            if st.checkbox(name, value=True):
-                display_features.append(name)
+        if features_present:
+            st.subheader("display features")
+            for name in features_names:
+                if st.checkbox(name, value=True):
+                    display_features.append(name)
 
     df = pd.DataFrame()
-    df[display_features] = features[display_features]
+    if features_present:
+        df[display_features] = features[display_features]
     results = pd.DataFrame(raw[personal_position - 1]["splits"])
     df["gap"] = results["split_gap"]
     df["perc"] = results["percentage_gap"]
@@ -156,8 +160,6 @@ if st.session_state.data_fetched and (
     color_scale = alt.Scale(
         domain=[0, 25, 100, 300], range=["green", "yellow", "red", "darkred"]
     )
-
-    H = 200
 
     splits = (
         alt.Chart(df)
@@ -182,26 +184,27 @@ if st.session_state.data_fetched and (
                 alt.Tooltip(field="perc", title="%", format=".1f"),
             ],
         )
-    ).properties(height=H)
+    )
 
     chart = splits
-    for feature in display_features:
-        base = AltairCharts(
-            y_title=feature,
-            x_label_visibility=False,
-            plot_h=H * 2 / 5,
-            small=8,
-            medium=12,
-        )
-        axis = base.axis_ruler(df, color="blue")
-        bars = base.data_chart("bar", df, "control:O", feature, "control").encode(
-            color=alt.value("blue"),
-            y=alt.Y(
-                feature,
-                axis=alt.Axis(titleFontSize=12, labelFontSize=8, title=feature),
-                scale=alt.Scale(domain=[-4, 4]),
-            ),
-        )
-        chart = chart & base.main_plot(bars, axis)
+    if features_present:
+        for feature in display_features:
+            base = AltairCharts(
+                y_title=feature,
+                x_label_visibility=False,
+                plot_h=100,
+                small=8,
+                medium=12,
+            )
+            axis = base.axis_ruler(df, color="blue")
+            bars = base.data_chart("bar", df, "control:O", feature, "control").encode(
+                color=alt.value("blue"),
+                y=alt.Y(
+                    feature,
+                    axis=alt.Axis(titleFontSize=12, labelFontSize=8, title=feature),
+                    scale=alt.Scale(domain=[-4, 4]),
+                ),
+            )
+            chart = chart & base.main_plot(bars, axis)
 
     st.altair_chart(chart)
