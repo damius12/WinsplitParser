@@ -64,6 +64,7 @@ else:
 
         with other:
             st.subheader("Custom features")
+            "*insert feature names and values (from -4 to 4) for each control*"
             number_controls = len(raw[0]["splits"])
             number_features = st.session_state.number_features
 
@@ -84,6 +85,7 @@ else:
                                 "insert number",
                                 min_value=-4,
                                 max_value=4,
+                                value=0,
                                 label_visibility="collapsed",
                                 key=f"{i}-{f}",
                                 step=1,
