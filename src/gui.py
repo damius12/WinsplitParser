@@ -5,8 +5,6 @@ from main import main
 import streamlit as st
 from AltairCharts import AltairCharts
 
-# https://obasen.orientering.se/winsplits/online/en/default.asp?page=table&databaseId=106316&categoryId=1
-
 st.set_page_config(layout="wide")
 
 if "data_fetched" not in st.session_state:
@@ -84,6 +82,8 @@ else:
                         if i > 0:
                             features_matrix[i, f] = tab[i][f + 1].number_input(
                                 "insert number",
+                                min_value=-4,
+                                max_value=4,
                                 label_visibility="collapsed",
                                 key=f"{i}-{f}",
                                 step=1,
@@ -152,14 +152,16 @@ if st.session_state.data_fetched and (
     y = "gap" if show_gap == "absolute" else "perc"
     y_label = "s" if show_gap == "absolute" else "%"
     color_scale = alt.Scale(
-        domain=[0, 50, 100, 300], range=["green", "yellow", "red", "darkred"]
+        domain=[0, 25, 100, 300], range=["green", "yellow", "red", "darkred"]
     )
+
+    H = 200
 
     splits = (
         alt.Chart(df)
         .mark_bar()
         .encode(
-            x="control:O",
+            x=alt.X("control:O", title=None),
             y=(
                 alt.Y(
                     y,
@@ -172,13 +174,22 @@ if st.session_state.data_fetched and (
                 )
             ),
             color=alt.Color("perc:Q", scale=color_scale, title="percentage gap"),
+            tooltip=[
+                alt.Tooltip(field="control"),
+                alt.Tooltip(field="gap", title="seconds gap", format=".0f"),
+                alt.Tooltip(field="perc", title="%", format=".1f"),
+            ],
         )
-    ).properties(height=250)
+    ).properties(height=H)
 
     chart = splits
     for feature in display_features:
         base = AltairCharts(
-            y_title=feature, x_label_visibility=False, plot_h=100, small=8, medium=12
+            y_title=feature,
+            x_label_visibility=False,
+            plot_h=H * 2 / 5,
+            small=8,
+            medium=12,
         )
         axis = base.axis_ruler(df, color="blue")
         bars = base.data_chart("bar", df, "control:O", feature, "control").encode(
