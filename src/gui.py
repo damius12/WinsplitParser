@@ -193,7 +193,12 @@ if st.session_state.data_fetched and (
         )
         axis = base.axis_ruler(df, color="blue")
         bars = base.data_chart("bar", df, "control:O", feature, "control").encode(
-            color=alt.value("blue")
+            color=alt.value("blue"),
+            y=alt.Y(
+                feature,
+                axis=alt.Axis(titleFontSize=12, labelFontSize=8, title=feature),
+                scale=alt.Scale(domain=[-4, 4]),
+            ),
         )
         chart = chart & base.main_plot(bars, axis)
 
