@@ -154,19 +154,36 @@ if st.session_state.data_fetched and (
     color_scale = alt.Scale(
         domain=[0, 50, 100, 300], range=["green", "yellow", "red", "darkred"]
     )
-    altair = AltairCharts()
-    bars = altair.data_chart("bar", df, "control:O", y, "perc:Q").encode(
-        y=(
-            alt.Y(
-                y,
-                title=y_label,
-                scale=(
-                    alt.Scale(domain=[0, np.ceil(max(df["perc"]) / 100) * 100])
-                    if show_gap == "relative"
-                    else alt.Undefined
-                ),
-            )
-        ),
-        color=alt.Color("perc:Q", scale=color_scale, title="percentage gap"),
-    )
-    st.altair_chart(bars)
+
+    splits = (
+        alt.Chart(df)
+        .mark_bar()
+        .encode(
+            x="control:O",
+            y=(
+                alt.Y(
+                    y,
+                    title=y_label,
+                    scale=(
+                        alt.Scale(domain=[0, np.ceil(max(df["perc"]) / 100) * 100])
+                        if show_gap == "relative"
+                        else alt.Undefined
+                    ),
+                )
+            ),
+            color=alt.Color("perc:Q", scale=color_scale, title="percentage gap"),
+        )
+    ).properties(height=250)
+
+    chart = splits
+    for feature in display_features:
+        base = AltairCharts(
+            y_title=feature, x_label_visibility=False, plot_h=100, small=8, medium=12
+        )
+        axis = base.axis_ruler(df, color="blue")
+        bars = base.data_chart("bar", df, "control:O", feature, "control").encode(
+            color=alt.value("blue")
+        )
+        chart = chart & base.main_plot(bars, axis)
+
+    st.altair_chart(chart)
