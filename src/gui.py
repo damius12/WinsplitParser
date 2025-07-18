@@ -120,6 +120,10 @@ if st.session_state.data_fetched and (
     st.session_state.control_survey_spec or st.session_state.skip
 ):
 
+    features = st.session_state.features
+    features_names = features.columns
+    display_features = []
+
     with st.sidebar:
         st.subheader(event_data["name"])
         event_data["class"]
@@ -128,7 +132,14 @@ if st.session_state.data_fetched and (
         personal_name = raw[personal_position - 1]["name"]
         st.markdown(f"**{personal_name}**")
         "---"
-        show_gap = st.radio("show gap", ["absolute", "relative"])
+        st.subheader("show gap")
+        show_gap = st.radio(
+            "show gap", ["absolute", "relative"], label_visibility="collapsed"
+        )
+        st.subheader("display features")
+        for name in features_names:
+            if st.checkbox(name, value=True):
+                display_features.append(name)
 
     df = pd.DataFrame()
     results = pd.DataFrame(raw[personal_position - 1]["splits"])
