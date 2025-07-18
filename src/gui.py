@@ -35,8 +35,8 @@ if not st.session_state.data_fetched:
 else:
     event_data = st.session_state.raw["event_data"]
     raw = st.session_state.raw["results"]
-    if "features_number" not in st.session_state:
-        st.session_state.features_number = 1
+    if "number_features" not in st.session_state:
+        st.session_state.number_features = 2
     if not st.session_state.control_survey_spec:
         st.markdown(event_data["date"])
         st.subheader(event_data["name"])
@@ -51,52 +51,72 @@ else:
             if left.button(
                 "add extra feature", type="secondary", use_container_width=True
             ):
-                st.session_state.features_number += 1
+                st.session_state.number_features += 1
                 st.rerun()
-            if st.session_state.features_number > 0 and right.button(
+            if st.session_state.number_features > 0 and right.button(
                 "remove one feature", type="tertiary", use_container_width=True
             ):
-                st.session_state.features_number -= 1
+                st.session_state.number_features -= 1
                 st.rerun()
 
             "Don't worry, you can skip this part:)"
 
             if st.button("skip", use_container_width=True):
-                st.session_state.control_survey_spec = True
                 st.session_state.skip = True
 
         with other:
             st.subheader("Custom features")
-            features_names = [1] * st.session_state.features_number
-            for i in range(0, st.session_state.features_number):
-                features_names[i] = st.text_input(
-                    f"insert a feature {i}",
-                    placeholder="e. g.: climb, vegetation, runnability, tiredness, etc.",
-                    label_visibility="collapsed",
-                )
+            number_controls = len(raw[0]["splits"])
+            number_features = st.session_state.number_features
+
+            tab = [1] * (number_controls + 1)
+            features_names = [1] * number_features
+
+            features_matrix = np.zeros((number_controls, number_features))
+            with st.container(border=True):
+                for i in range(number_controls):
+                    tab[i] = st.columns(number_features + 1)
+                    if i > 0:
+                        tab[i][0].markdown(i)
+                    else:
+                        tab[i][0].markdown("Control")
+                    for f in range(number_features):
+                        if i > 0:
+                            features_matrix[i, f] = tab[i][f + 1].number_input(
+                                "insert number",
+                                label_visibility="collapsed",
+                                key=f"{i}-{f}",
+                                step=1,
+                            )
+                        else:
+                            features_names[f] = tab[i][f + 1].text_input(
+                                "insert feature",
+                                key=f,
+                                placeholder="e. g.: climb, vegetation, runnability, tiredness, etc.",
+                                label_visibility="collapsed",
+                            )
 
             if "" in features_names:
                 st.warning("to proceed all fields must be filled")
-            yes, no = st.columns(2)
-            if yes.button(
+
+            if st.button(
                 "**proceed**",
                 type="primary",
                 use_container_width=True,
                 disabled="" in features_names,
             ):
-                st.session_state.features = features_names
+                features = pd.DataFrame(
+                    {
+                        name: features_matrix[:, i]
+                        for i, name in enumerate(features_names)
+                    }
+                )
+                st.session_state.features = features
                 st.session_state.control_survey_spec = True
                 st.rerun()
 
-    if st.session_state.control_survey_spec and not (
-        st.session_state.assign_features or st.session_state.skip
-    ):
-        st.write(st.session_state.features)
-
-if (
-    st.session_state.data_fetched
-    and st.session_state.control_survey_spec
-    and (st.session_state.assign_features or st.session_state.skip)
+if st.session_state.data_fetched and (
+    st.session_state.control_survey_spec or st.session_state.skip
 ):
 
     with st.sidebar:
