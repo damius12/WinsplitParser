@@ -82,7 +82,7 @@ else:
                         tab[i][0].markdown("Control")
                     for f in range(number_features):
                         if i > 0:
-                            features_matrix[i, f] = tab[i][f + 1].number_input(
+                            features_matrix[i - 1, f] = tab[i][f + 1].number_input(
                                 "insert number",
                                 min_value=-4,
                                 max_value=4,
@@ -197,12 +197,14 @@ if st.session_state.data_fetched and (
                 medium=12,
             )
             axis = base.axis_ruler(df, color="blue")
-            bars = base.data_chart("bar", df, "control:O", feature, "control").encode(
+            bars = base.data_chart(
+                "bar", df, "control:O", feature + ":Q", "control"
+            ).encode(
                 color=alt.value("blue"),
                 y=alt.Y(
-                    feature,
+                    feature + ":Q",
                     axis=alt.Axis(titleFontSize=12, labelFontSize=8, title=feature),
-                    scale=alt.Scale(domain=[-4, 4]),
+                    scale=alt.Scale(domain=[-4, 4] if min(df[feature]) < 0 else [0, 4]),
                 ),
             )
             chart = chart & base.main_plot(bars, axis)
